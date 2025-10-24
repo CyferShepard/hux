@@ -89,5 +89,6 @@ export 'src/widgets/hux_context_menu/hux_context_menu.dart';
 export 'src/widgets/hux_context_menu/hux_context_menu_divider.dart';
 export 'src/widgets/hux_context_menu/hux_context_menu_item.dart';
 export 'src/widgets/hux_date_picker.dart';
+export 'src/widgets/hux_date_range_picker.dart';
 export 'src/widgets/hux_loading.dart';
 export 'src/widgets/hux_time_picker.dart';
