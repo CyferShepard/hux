@@ -72,6 +72,7 @@ export 'src/components/inputs/hux_checkbox.dart';
 export 'src/components/inputs/hux_date_input.dart';
 export 'src/components/inputs/hux_input.dart';
 export 'src/components/inputs/hux_radio.dart';
+export 'src/components/multiselect_searchable_dropdown/hux_multiselect_searchable_dropdown.dart';
 export 'src/components/navigation/hux_breadcrumbs.dart';
 export 'src/components/navigation/hux_sidebar.dart';
 export 'src/components/navigation/hux_sidebar_item.dart';
