@@ -134,6 +134,9 @@ class _HuxDatePickerState extends State<HuxDatePicker> {
               offset: followerOffset,
               child: Material(
                 color: widget.overlayColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16), // Apply rounded corners
+                ),
                 child: _HuxDatePickerPanel(
                   initialDate: _currentDate,
                   firstDate: widget.firstDate,
