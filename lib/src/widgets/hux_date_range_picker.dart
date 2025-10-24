@@ -600,7 +600,8 @@ class _HuxDateRangePickerPanelState extends State<_HuxDateRangePickerPanel> {
                     child: _buildDayCell(
                       day: prevMonthDay,
                       isCurrentMonth: false,
-                      isSelected: false,
+                      isSelected: false, // check this out
+                      isInSelectionRange: false,
                       isToday: false,
                       isDisabled: true,
                     ),
@@ -613,6 +614,7 @@ class _HuxDateRangePickerPanelState extends State<_HuxDateRangePickerPanel> {
                       day: nextMonthDay,
                       isCurrentMonth: false,
                       isSelected: false,
+                      isInSelectionRange: false, // check this out
                       isToday: false,
                       isDisabled: true,
                     ),
@@ -625,6 +627,10 @@ class _HuxDateRangePickerPanelState extends State<_HuxDateRangePickerPanel> {
                       (date.year == _selectedEndDate.year &&
                           date.month == _selectedEndDate.month &&
                           date.day == _selectedEndDate.day);
+                  final bool isInSelectionRange = date.isAfter(_selectedStartDate) && date.isBefore(_selectedEndDate);
+                  final bool isRoundedStart = date.year == _selectedStartDate.year &&
+                      date.month == _selectedStartDate.month &&
+                      date.day == _selectedStartDate.day;
                   final DateTime now = DateTime.now();
                   final bool isToday = date.year == now.year && date.month == now.month && date.day == now.day;
                   final bool isDisabled = date.isBefore(widget.firstDate) || date.isAfter(widget.lastDate);
@@ -635,6 +641,8 @@ class _HuxDateRangePickerPanelState extends State<_HuxDateRangePickerPanel> {
                       day: dayNumber,
                       isCurrentMonth: true,
                       isSelected: isSelected,
+                      roundedStart: isRoundedStart,
+                      isInSelectionRange: isInSelectionRange,
                       isToday: isToday,
                       isDisabled: isDisabled,
                       onTap: isDisabled ? null : () => _handleSelect(date),
@@ -655,6 +663,8 @@ class _HuxDateRangePickerPanelState extends State<_HuxDateRangePickerPanel> {
     required int day,
     required bool isCurrentMonth,
     required bool isSelected,
+    required bool isInSelectionRange,
+    bool roundedStart = true,
     required bool isToday,
     required bool isDisabled,
     VoidCallback? onTap,
@@ -663,6 +673,8 @@ class _HuxDateRangePickerPanelState extends State<_HuxDateRangePickerPanel> {
       day: day,
       isCurrentMonth: isCurrentMonth,
       isSelected: isSelected,
+      isInSelectionRange: isInSelectionRange,
+      roundedStart: roundedStart,
       isToday: isToday,
       isDisabled: isDisabled,
       onTap: onTap,
@@ -681,6 +693,8 @@ class _DayCell extends StatefulWidget {
     required this.day,
     required this.isCurrentMonth,
     required this.isSelected,
+    this.roundedStart = true,
+    required this.isInSelectionRange,
     required this.isToday,
     required this.isDisabled,
     this.onTap,
@@ -689,6 +703,8 @@ class _DayCell extends StatefulWidget {
   final int day;
   final bool isCurrentMonth;
   final bool isSelected;
+  final bool roundedStart;
+  final bool isInSelectionRange;
   final bool isToday;
   final bool isDisabled;
   final VoidCallback? onTap;
@@ -700,6 +716,9 @@ class _DayCell extends StatefulWidget {
 class _DayCellState extends State<_DayCell> {
   bool _isHovered = false;
   bool _isPressed = false;
+
+  bool get roundedStart => widget.roundedStart;
+  bool get isToday => widget.isToday;
 
   @override
   Widget build(BuildContext context) {
@@ -716,10 +735,22 @@ class _DayCellState extends State<_DayCell> {
           duration: const Duration(milliseconds: 150),
           width: 32,
           height: 32,
-          margin: const EdgeInsets.all(1),
+          margin: widget.isInSelectionRange ? null : EdgeInsets.only(left: roundedStart ? 0 : 1, right: roundedStart ? 1 : 0),
           decoration: BoxDecoration(
             color: _getBackgroundColor(),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: widget.isInSelectionRange
+                ? null
+                : (isToday
+                    ? BorderRadius.circular(8)
+                    : (roundedStart
+                        ? BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            bottomLeft: Radius.circular(8),
+                          )
+                        : BorderRadius.only(
+                            topRight: Radius.circular(8),
+                            bottomRight: Radius.circular(8),
+                          ))),
             border: _getBorder(),
           ),
           child: Center(
@@ -739,6 +770,7 @@ class _DayCellState extends State<_DayCell> {
 
   Color _getBackgroundColor() {
     if (widget.isDisabled) return Colors.transparent;
+    if (widget.isInSelectionRange) return HuxTokens.primary(context).withAlpha(30);
     if (widget.isSelected) return HuxTokens.primary(context);
     if (_isPressed) {
       return HuxTokens.surfaceHover(context);
